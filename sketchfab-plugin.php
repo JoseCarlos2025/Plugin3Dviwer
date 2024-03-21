@@ -25,7 +25,7 @@ function sketchfab_viewer_shortcode($atts) {
                 $button_label = isset($button['label']) ? $button['label'] : '';
                 $button_id = isset($button['id']) ? $button['id'] : '';
                 if (!empty($button_label) && !empty($button_id)) {
-                    $output .= '<button id="' . esc_attr($button_id) . '" class="viewer-button">' . esc_html($button_label) . '</button>';
+                    $output .= '<button data-hotspot="' . esc_attr($button_id) . '" class="viewer-button">' . esc_html($button_label) . '</button>';
                 }
             }
             $output .= '</div>';
@@ -156,7 +156,7 @@ function sketchfab_viewer_button_field_render() {
         <div class="sketchfab-button">
             <label for="sketchfab_viewer_button_label_<?php echo $key; ?>">Etiqueta del Botón:</label>
             <input type="text" id="sketchfab_viewer_button_label_<?php echo $key; ?>" name="sketchfab_viewer_options[buttons][<?php echo $key; ?>][label]" value="<?php echo esc_attr($button_label); ?>" /><br />
-            <label for="sketchfab_viewer_button_id_<?php echo $key; ?>">ID del Botón:</label>
+            <label for="sketchfab_viewer_button_id_<?php echo $key; ?>">Número del Hotspot:</label>
             <input type="text" id="sketchfab_viewer_button_id_<?php echo $key; ?>" name="sketchfab_viewer_options[buttons][<?php echo $key; ?>][id]" value="<?php echo esc_attr($button_id); ?>" />
             <button type="button" class="delete-button">Eliminar</button>
         </div>
@@ -175,7 +175,7 @@ function sketchfab_viewer_button_field_render() {
                 newButton.classList.add('sketchfab-button');
                 newButton.innerHTML = '<label for="sketchfab_viewer_button_label_' + counter + '">Etiqueta del Botón:</label>' +
                                       '<input type="text" id="sketchfab_viewer_button_label_' + counter + '" name="sketchfab_viewer_options[buttons][' + counter + '][label]" value="" /><br />' +
-                                      '<label for="sketchfab_viewer_button_id_' + counter + '">ID del Botón:</label>' +
+                                      '<label for="sketchfab_viewer_button_id_' + counter + '">Número del Hotspot:</label>' +
                                       '<input type="text" id="sketchfab_viewer_button_id_' + counter + '" name="sketchfab_viewer_options[buttons][' + counter + '][id]" value="" />' +
                                       '<button type="button" class="delete-button">Eliminar</button>';
                 container.appendChild(newButton);

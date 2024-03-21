@@ -3,17 +3,11 @@ window.addEventListener('visorLoadComplete', function () {
     const botones = document.querySelectorAll('.viewer-button');
 
     botones.forEach(boton => {
-        const id = obtenerUltimoNumero(boton.id);
-        boton.addEventListener('click', () => handleBAnimClick(id-1));
+        boton.addEventListener('click', (e) => handleBAnimClick(e));
     });
 
-    function handleBAnimClick(id) {
-        PlayAnimation(id);
-    }
-
-    function obtenerUltimoNumero(cadena) {
-        const numeros = cadena.match(/\d+/g);
-        return numeros ? parseInt(numeros[numeros.length - 1]) : null;
+    function handleBAnimClick(e) {
+        PlayAnimation(Number(e.target.getAttribute('data-hotspot') - 1));
     }
 
     window.addEventListener('hotspotselected', function (event) {
