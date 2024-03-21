@@ -46,6 +46,9 @@ add_shortcode('sketchfab_viewer', 'sketchfab_viewer_shortcode');
 function sketchfab_viewer_styles() {
     $options = get_option('sketchfab_viewer_options');
     $background_color = isset($options['background_color']) ? $options['background_color'] : '#ffffff';
+    $text_color = isset($options['text_color']) ? $options['text_color'] : '#000000';
+    $hover_color = isset($options['hover_color']) ? $options['hover_color'] : '#131C2B';
+
 
     echo '<style>
             .viwer-frame {
@@ -55,7 +58,7 @@ function sketchfab_viewer_styles() {
             .viewer-button {
                 border: none;
                 background-color: ' . $background_color . ';
-                color: white;
+                color: ' . $text_color . ';
                 text-align: center; 
                 text-decoration: none;
                 display: inline-flex;
@@ -69,7 +72,7 @@ function sketchfab_viewer_styles() {
             }
               
             .viewer-button:hover {
-                background-color: #131C2B; 
+                background-color: '. $hover_color .'; 
             }
 
             .buttom-container {
@@ -114,7 +117,9 @@ function sketchfab_viewer_admin_init() {
     add_settings_section('sketchfab_viewer_main_section', 'Configuración Principal', 'sketchfab_viewer_section_callback', 'sketchfab-viewer-config');
     add_settings_field('sketchfab_viewer_width_field', 'Ancho del modelo 3D', 'sketchfab_viewer_width_field_render', 'sketchfab-viewer-config', 'sketchfab_viewer_main_section');
     add_settings_field('sketchfab_viewer_height_field', 'Alto del modelo 3D', 'sketchfab_viewer_height_field_render', 'sketchfab-viewer-config', 'sketchfab_viewer_main_section');
-    add_settings_field('sketchfab_viewer_color_field', 'Color de Fondo', 'sketchfab_viewer_color_field_render', 'sketchfab-viewer-config', 'sketchfab_viewer_main_section');
+    add_settings_field('sketchfab_viewer_color_field', 'Color del Botón', 'sketchfab_viewer_color_field_render', 'sketchfab-viewer-config', 'sketchfab_viewer_main_section');
+    add_settings_field('sketchfab_viewer_hover_color_field', 'Color al pasar por encima del botón', 'sketchfab_viewer_hover_color_field_render', 'sketchfab-viewer-config', 'sketchfab_viewer_main_section');
+    add_settings_field('sketchfab_viewer_text_color_field', 'Color texto del Botón', 'sketchfab_viewer_text_color_field_render', 'sketchfab-viewer-config', 'sketchfab_viewer_main_section');
     add_settings_field('sketchfab_viewer_button_field', 'Botones Personalizados', 'sketchfab_viewer_button_field_render', 'sketchfab-viewer-config', 'sketchfab_viewer_main_section');
 }
 add_action('admin_init', 'sketchfab_viewer_admin_init');
@@ -139,6 +144,18 @@ function sketchfab_viewer_color_field_render() {
     $options = get_option('sketchfab_viewer_options');
     $background_color = isset($options['background_color']) ? $options['background_color'] : '#ffffff';
     echo '<input type="color" name="sketchfab_viewer_options[background_color]" value="' . esc_attr($background_color) . '" />';
+}
+
+function sketchfab_viewer_hover_color_field_render() {
+    $options = get_option('sketchfab_viewer_options');
+    $hover_color = isset($options['hover_color']) ? $options['hover_color'] : '#131C2B';
+    echo '<input type="color" name="sketchfab_viewer_options[hover_color]" value="' . esc_attr($hover_color) . '" />';
+}
+
+function sketchfab_viewer_text_color_field_render() {
+    $options = get_option('sketchfab_viewer_options');
+    $text_color = isset($options['text_color']) ? $options['text_color'] : '#000000';
+    echo '<input type="color" name="sketchfab_viewer_options[text_color]" value="' . esc_attr($text_color) . '" />';
 }
 
 function sketchfab_viewer_button_field_render() {
