@@ -3,7 +3,7 @@
   Plugin Name: Sketchfab Viewer
   Description: Plugin para mostrar modelos 3D de Sketchfab.
   Version: 1.0
-  Author: Javier
+  Author: Javier y José Carlos
 */
 
 function sketchfab_viewer_shortcode($atts) {
@@ -16,8 +16,8 @@ function sketchfab_viewer_shortcode($atts) {
     ), $atts);
 
     if (!empty($atts['link'])) {
-        $output = '<div style="width: ' . esc_attr($width) . '; height: ' . esc_attr($height) . '; position:relative;">';
-        $output .= '<iframe style="width: ' . esc_attr($width) . '; height: ' . esc_attr($height) . '" class="viwer-frame" src="" id="api-frame" allow="autoplay; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" ></iframe>';
+        $output = '<div id="viewer-content" style="width: ' . esc_attr($width) . '; height: ' . esc_attr($height) . '; position:relative;">';
+        $output .= '<iframe style="width: ' . esc_attr($width) . '; height: ' . esc_attr($height) . '" class="viewer-frame" src="" id="api-frame" allow="autoplay; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" ></iframe>';
 
         if (!empty($options['buttons'])) {
             $output .= '<div class="buttom-container">';
@@ -31,10 +31,13 @@ function sketchfab_viewer_shortcode($atts) {
             $output .= '</div>';
         }
 
+        $output .= '<div id="content-entry"></div>';
+
         $output .= '</div>';
 
+        $output .= '<script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>';
+        $output .= '<script src="' . plugins_url( 'SnIViewer.min.js', __FILE__ ) . '"></script>';
         $output .= '<script src="' . plugins_url( 'visor-controller.js', __FILE__ ) . '"></script>';
-        $output .= '<script src="' . plugins_url( 'use-example.js', __FILE__ ) . '"></script>';
 
         return $output;
     } else {
@@ -51,10 +54,20 @@ function sketchfab_viewer_styles() {
 
 
     echo '<style>
-            .viwer-frame {
-              position: absolute;
+            #viewer-content {
+                display: flex;
+            }
+
+            .viewer-frame {
               border: none;
             }
+
+            #content-entry {
+                width: 30%;
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+
             .viewer-button {
                 border: none;
                 background-color: ' . $background_color . ';
@@ -88,11 +101,48 @@ function sketchfab_viewer_styles() {
                 pointer-events: auto;
             }
         </style>';
-
-    echo '<script type="text/javascript" src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.1.js"></script>
-    <script type="text/javascript" src="https://3dviwer.s3.eu-north-1.amazonaws.com/SnIViwer.min.js"></script>';
 }
 add_action('wp_head', 'sketchfab_viewer_styles');
+
+function my_custom_scripts() {
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('custom-script', plugin_dir_url(__FILE__) . 'custom-script.js', array('jquery'), '1.0', true);
+    wp_localize_script('custom-script', 'myAjax', array('ajaxurl' => admin_url('admin-ajax.php')));
+}
+add_action('wp_enqueue_scripts', 'my_custom_scripts');
+
+function cargar_contenido_entrada() {
+    if (isset($_POST['entry_title'])) {
+        $entry_title = sanitize_text_field($_POST['entry_title']); 
+
+        $args = array(
+            'post_type' => 'post',
+            'post_status' => 'publish',
+            's' => $entry_title, 
+        );
+
+        $entries = get_posts($args);
+
+        if ($entries) {
+            $entry = $entries[0];
+
+            $response = array(
+                'titulo' => $entry->post_title,
+                'contenido' => apply_filters('the_content', $entry->post_content),
+            );
+
+            echo json_encode($response);
+        } else {
+            echo json_encode(array('error' => 'No se encontró la entrada con el título especificado.'));
+        }
+    } else {
+        echo json_encode(array('error' => 'El título de la entrada no se proporcionó.'));
+    }
+
+    die();
+}
+add_action('wp_ajax_cargar_contenido_entrada', 'cargar_contenido_entrada');
+add_action('wp_ajax_nopriv_cargar_contenido_entrada', 'cargar_contenido_entrada');
 
 function sketchfab_viewer_menu() {
     add_options_page('Sketchfab Viewer Configuración', 'Sketchfab Viewer', 'manage_options', 'sketchfab-viewer-config', 'sketchfab_viewer_settings_page');
